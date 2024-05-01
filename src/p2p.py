@@ -113,7 +113,8 @@ class PeerNetwork:
             # Accept client connection and add to list of peers
             client_socket, client_address = self.socket.accept()
             self.peer_sockets.append(client_socket)
-            print(f"Client connected from: {client_address}")
+            print(f"Client connected from: {client_address}\n")
+            print(f"updated list of peers: {self.peer_sockets}\n")
         
     def _trackerNodeComm(self):
         """
@@ -128,14 +129,15 @@ class PeerNetwork:
                 socket.settimeout(5)  # set time for client to respond to tracker's query
                 try:
                     decoded_data = socket.recv(1024).decode()
-                    if not decoded_data in self.peers:  # client is new
+                    if not (decoded_data in self.peers):  # client is new
                         self.peers.append(decoded_data)
                         self.dict[socket] = decoded_data
-                        print(decoded_data)
+                        print(f"new peer joined: {decoded_data}\n")
                         socket.sendall(",".join(self.peers).encode())  # send updated list of peers
                 except socket.timeout:  # client has left
                     self.peer_sockets.remove(socket)
                     self.peers.remove(self.dict[socket])
+                    print(f"peer left: {self.dict[socket]}\n")
                     socket.sendall(",".join(self.peers).encode())  # send updated list of peers
         
 
