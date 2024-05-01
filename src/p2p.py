@@ -28,6 +28,8 @@ class PeerNetwork:
     def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int) -> None:
         self.peers = []
         self.peer_sockets = []
+        self.recv_sockets = []
+        self.send_sockets = []
         self.tracker_addr = tracker_addr
         self.port = tracker_port
         self.hostname = gethostname()
@@ -54,10 +56,19 @@ class PeerNetwork:
         threading.Thread(target=self._nodeTrackerComm, args=()).start()
 
         while True:
-            new_block = self.servSock.recv(1024).decode()  # receive data from peer
+            # Accept client connection and add to list of peers
+            client_socket, client_address = self.servSock.accept()
+            self.recv_sockets.append(client_socket)
+            print(f"Client connected from: {client_address}")
+
+            threading.Thread(target=self._peerComm, args=(client_socket,)).start()  # create a thread for each peer connection (recv channel)
+    
+    def _peerComm(self, client_socket):
+        while True:
+            new_block = client_socket.recv(1024).decode()  # receive data from peer
             new_block_hash = new_block.mine('0000')
             try:
-                # This is how a block can be added to a blockchain
+                # add incoming block to this blockchain
                 self.blockchain.add_block(new_block, new_block_hash)
             except Exception as e:
                 print(e)
@@ -112,10 +123,10 @@ class PeerNetwork:
                 socket.settimeout(5)  # set time for client to respond to tracker's query
                 try:
                     decoded_data = socket.recv(1024).decode()
-                    print(decoded_data)
                     if not decoded_data in self.peers:  # client is new
                         self.peers.append(decoded_data)
                         self.dict[socket] = decoded_data
+                        print(decoded_data)
                         socket.sendall(",".join(self.peers).encode())  # send updated list of peers
                 except socket.timeout:  # client has left
                     self.peer_sockets.remove(socket)
