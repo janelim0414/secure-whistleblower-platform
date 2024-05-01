@@ -125,8 +125,9 @@ class PeerNetwork:
 
 if __name__ == "__main__":
     tracker_port = int(sys.argv[1]) # the port used to send messages to neighbors
-    is_tracker = bool(int(sys.argv[2])) # the port used to send messages to neighbors
+    tracker_addr = sys.argv[2]
+    is_tracker = bool(int(sys.argv[3])) # the port used to send messages to neighbors
 
-    PeerNetwork(is_tracker, tracker_port)
+    PeerNetwork(is_tracker, tracker_addr, tracker_port)
 
 
