@@ -82,7 +82,7 @@ class PeerNetwork:
             sock.sendall(block.encode())  # send given data to peers  
 
     def _handleTracker(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(AF_INET, SOCK_STREAM)
         self.socket.bind(("127.0.0.1", self.port))
         self.socket.listen()
 
