@@ -73,9 +73,9 @@ class PeerNetwork:
                 new_peers = decoded_data.split(",")
                 for peer in new_peers:
                     if not peer in self.peers:
-                        socket = socket(AF_INET, SOCK_STREAM)
-                        socket.connect((peer, self.port)) 
-                        self.peer_sockets.append(socket)
+                        s = socket(AF_INET, SOCK_STREAM)
+                        s.connect((peer, self.port)) 
+                        self.peer_sockets.append(s)
                 print(f"updated list of peers: {self.peers}\n")
     
     def _send(self, block):
