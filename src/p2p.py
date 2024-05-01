@@ -29,8 +29,8 @@ class PeerNetwork:
         self.peers = []
         self.peer_sockets = []
         self.port = tracker_port
-        self.hostname = socket.gethostname()
-        self.ip = socket.gethostbyname(self.hostname)
+        self.hostname = gethostname()
+        self.ip = gethostbyname(self.hostname)
         print("Internal IP:", self.ip)
         self.socket = None
         self.servSock = None
@@ -43,10 +43,10 @@ class PeerNetwork:
 
     def _handleNode(self):
         # add thread for validation of network
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = socket.socket(AF_INET, SOCK_STREAM)
         self.socket.connect(("127.0.0.1", self.port))  # connect to tracker node  
 
-        self.servSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.servSock = socket.socket(AF_INET, SOCK_STREAM)
         self.servSock.bind((self.ip, self.port))  
         self.servSock.listen()    
 
@@ -72,8 +72,8 @@ class PeerNetwork:
                 new_peers = decoded_data.split(",")
                 for peer in new_peers:
                     if not peer in self.peers:
-                        socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        socket.connect((peer, self.port))  # TODO port info about peer given by tracker
+                        socket = socket.socket(AF_INET, SOCK_STREAM)
+                        socket.connect((peer, self.port)) 
                         self.peer_sockets.append(socket)
                 print(f"updated list of peers: {self.peers}\n")
     
