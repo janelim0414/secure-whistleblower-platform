@@ -1,4 +1,5 @@
 from blockchain import Blockchain
+from block import Block
 from socket import *
 import sys
 import threading
@@ -66,12 +67,16 @@ class PeerNetwork:
     def _peerComm(self, client_socket):
         while True:
             new_block = client_socket.recv(1024).decode()  # receive data from peer
+            if not isinstance(new_block, Block):
+                continue
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
                 self.blockchain.add_block(new_block, new_block_hash)
             except Exception as e:
                 print(e)
+            print("added a block: \n")
+            self.blockchain.get_last_block().print_block()
 
     def _nodeTrackerComm(self):
         while True:
@@ -139,6 +144,11 @@ if __name__ == "__main__":
     tracker_addr = sys.argv[2]
     is_tracker = bool(int(sys.argv[3])) # the port used to send messages to neighbors
 
-    PeerNetwork(is_tracker, tracker_addr, tracker_port)
+    p2p_net = PeerNetwork(is_tracker, tracker_addr, tracker_port)
+    if not is_tracker:
+        last_block = p2p_net.blockchain.get_last_block()
+        last_block.print_block()
+        new_block = Block(last_block.block_number + 1, 'block 1 data', last_block.prev_hash)
+        p2p_net._send(new_block)
 
 
