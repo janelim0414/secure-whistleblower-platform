@@ -87,6 +87,7 @@ class PeerNetwork:
             # save updated list of peers from tracker
             else:  
                 new_peers = decoded_data.split(",")
+                print(decoded_data)
                 for peer in new_peers:
                     if not peer in self.peers:
                         s = socket(AF_INET, SOCK_STREAM)
