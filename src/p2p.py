@@ -25,9 +25,10 @@ tracker node:
 """
 
 class PeerNetwork:
-    def __init__(self, is_tracker: bool, tracker_port: int) -> None:
+    def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int) -> None:
         self.peers = []
         self.peer_sockets = []
+        self.tracker_addr = tracker_addr
         self.port = tracker_port
         self.hostname = gethostname()
         self.ip = gethostbyname(self.hostname)
@@ -44,7 +45,7 @@ class PeerNetwork:
     def _handleNode(self):
         # add thread for validation of network
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.connect(("127.0.0.1", self.port))  # connect to tracker node  
+        self.socket.connect((self.tracker_addr, self.port))  # connect to tracker node  
 
         self.servSock = socket(AF_INET, SOCK_STREAM)
         self.servSock.bind((self.ip, self.port))  
@@ -82,8 +83,10 @@ class PeerNetwork:
             sock.sendall(block.encode())  # send given data to peers  
 
     def _handleTracker(self):
+        if self.tracker_addr != self.ip:
+            raise Exception(f"Invalid tracker address: rerun with {self.ip}\n")
         self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.bind(("127.0.0.1", self.port))
+        self.socket.bind((self.tracker_addr, self.port))
         self.socket.listen()
 
         print(f"Server listening on port: {self.port}\n")
