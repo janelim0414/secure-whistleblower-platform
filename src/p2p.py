@@ -62,9 +62,12 @@ class PeerNetwork:
             self.recv_sockets.append(client_socket)
             print(f"Client connected from: {client_address}")
 
-            threading.Thread(target=self._peerComm, args=(client_socket,)).start()  # create a thread for each peer connection (recv channel)
+            threading.Thread(target=self._receive, args=(client_socket,)).start()  # create a thread for each peer connection (recv channel)
     
-    def _peerComm(self, client_socket):
+    def _receive(self, client_socket):
+        """
+        receive data from each peer/client connection
+        """
         while True:
             new_block = client_socket.recv(1024).decode()  # receive data from peer
             if new_block == "":  # peer has disconnected
@@ -101,7 +104,11 @@ class PeerNetwork:
                 print(f"updated list of peers: {self.peers}\n")
     
     def _send(self, block):
+        """
+        send to each peer/server connection
+        """
         for sock in self.peer_sockets:
+            print(f"sending new block from {self.ip} to {sock}")
             sock.sendall(block.encode())  # send given data to peers  
 
     def _handleTracker(self):
