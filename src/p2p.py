@@ -184,6 +184,7 @@ if __name__ == "__main__":
     is_tracker = bool(int(sys.argv[3])) # the port used to send messages to neighbors
 
     p2p_net = PeerNetwork(is_tracker, tracker_addr, tracker_port)
+    print("here")
     if not is_tracker:
         last_block = p2p_net.blockchain.get_last_block()
         last_block.print_block()
