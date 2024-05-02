@@ -67,8 +67,10 @@ class PeerNetwork:
     def _peerComm(self, client_socket):
         while True:
             new_block = client_socket.recv(1024).decode()  # receive data from peer
-            if not isinstance(new_block, Block):
-                continue
+            if new_block == "":  # peer has disconnected
+                client_socket.close()
+                self.recv_sockets.remove(client_socket)
+                print(f"Client disconnected: {client_socket}")
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
@@ -144,15 +146,15 @@ class PeerNetwork:
         """
         Handle the scenario where a peer leaves the network.
         """
-        self.peer_sockets.remove(socket)
-        if socket in self.dict:
-            peer_ip = self.dict[socket]
-            self.peers.remove(peer_ip)
+        peer_ip = self.dict.pop(socket, None)
+        if peer_ip:
             print(f"Peer left: {peer_ip}\n")
+            socket.close()  # Close the socket
+            self.peer_sockets.remove(socket)
+            self.peers.remove(peer_ip)
             for s in self.peer_sockets:
                 s.sendall(",".join(self.peers).encode())  # Send updated list of peers
                 print(f"Updated list of peers sent to {s}: {self.peers}")
-            del self.dict[socket]
 
     def _handleNewPeer(self, socket, peer_ip):
         """
