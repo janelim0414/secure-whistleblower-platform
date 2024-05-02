@@ -4,6 +4,7 @@ from socket import *
 import sys
 import threading
 import json
+import queue
 
 """
 inspired by bitorrent p2p architecture
@@ -25,12 +26,24 @@ tracker node:
 
 """
 
+class MsgQueue:
+    def __init__(self):
+        self.queue = queue.Queue()
+
+    def put_msg(self, block):
+        self.queue.put(block)
+
+    def get_msg(self):
+        return self.queue.get()
+    
+    def queue_empty(self):
+        return self.queue.isEmpty()
+
 class PeerNetwork:
-    def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int) -> None:
+    def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int, msg_q: str) -> None:
         self.peers = []
         self.peer_sockets = []
         self.recv_sockets = []
-        self.send_sockets = []
         self.tracker_addr = tracker_addr
         self.port = tracker_port
         self.hostname = gethostname()
@@ -38,6 +51,7 @@ class PeerNetwork:
         print("Internal IP:", self.ip)
         self.socket = None
         self.servSock = None
+        self.msg_q = msg_q
         self.blockchain = Blockchain()
         self.dict = {}  # maps ip to tracker socket connection
         if is_tracker:
@@ -104,14 +118,20 @@ class PeerNetwork:
                 self.peers = new_peers
                 print(f"updated list of peers: {self.peers}\n")
     
-    def _send(self, block):
+    def _send(self):
         """
         send to each peer/server connection
         """
-        block = json.dumps(block)
-        for sock in self.peer_sockets:
-            print(f"sending new block from {self.ip} to {sock}")
-            sock.sendall(block.encode())  # send given data to peers  
+        while True:
+            if not self.msg_q.queue_empty():
+                msg = self.msg_q.get_msg()  # retreive message from queue
+                last_block = self.blockchain.get_last_block()
+                last_block.print_block()
+                new_block = Block(last_block.block_number + 1, msg, last_block.prev_hash)  # create block from message
+                block_to_send = json.dumps(new_block)
+                for sock in self.peer_sockets:
+                    print(f"sending new block from {self.ip} to {sock}")
+                    sock.sendall(block_to_send.encode())  # send given data to peers  
 
     def _handleTracker(self):
         if self.tracker_addr != self.ip:
@@ -183,12 +203,16 @@ if __name__ == "__main__":
     tracker_addr = sys.argv[2]
     is_tracker = bool(int(sys.argv[3])) # the port used to send messages to neighbors
 
-    p2p_net = PeerNetwork(is_tracker, tracker_addr, tracker_port)
+    def run_p2p_net(msg_q):
+        PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
+
+    # Start the PeerNetwork class in a separate thread
+    msg_q = MsgQueue()
+    peer_network_thread = threading.Thread(target=run_p2p_net, args=(msg_q,))
+    peer_network_thread.start()
+
     print("here")
     if not is_tracker:
-        last_block = p2p_net.blockchain.get_last_block()
-        last_block.print_block()
-        new_block = Block(last_block.block_number + 1, 'block 1 data', last_block.prev_hash)
-        p2p_net._send(new_block)
+        msg_q.put_msg('block 1 data')
 
 
