@@ -14,7 +14,7 @@ new node:
 - 
 
 peer nodes:
-- tracker node keeps a timer for each peer node and each node periodically notifies tracker of its membership
+- each peer node periodically notifies tracker of its membership
 - maintains blockchain and send/receive blocks over TCP
 - two threads for receive() and send() -- is both a server and a client
 
@@ -71,7 +71,7 @@ class PeerNetwork:
                 client_socket.close()
                 self.recv_sockets.remove(client_socket)
                 print(f"Client disconnected: {client_socket}")
-                continue
+                break
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
