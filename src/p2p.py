@@ -3,7 +3,7 @@ from block import Block
 from socket import *
 import sys
 import threading
-import time
+import json
 
 """
 inspired by bitorrent p2p architecture
@@ -75,6 +75,7 @@ class PeerNetwork:
                 self.recv_sockets.remove(client_socket)
                 print(f"Client disconnected: {client_socket}")
                 break
+            new_block = json.loads(new_block)
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
@@ -107,6 +108,7 @@ class PeerNetwork:
         """
         send to each peer/server connection
         """
+        block = json.dumps(block)
         for sock in self.peer_sockets:
             print(f"sending new block from {self.ip} to {sock}")
             sock.sendall(block.encode())  # send given data to peers  
