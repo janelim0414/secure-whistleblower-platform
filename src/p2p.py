@@ -81,6 +81,7 @@ class PeerNetwork:
     def _nodeTrackerComm(self):
         while True:
             decoded_data = self.socket.recv(1024).decode()  # receive data from tracker
+            print(decoded_data)
             # handle query from tracker
             if decoded_data == "OK":  
                 self.socket.sendall(self.ip.encode())  # send ip address
@@ -115,7 +116,6 @@ class PeerNetwork:
             client_socket, client_address = self.socket.accept()
             self.peer_sockets.append(client_socket)
             print(f"Client connected from: {client_address}\n")
-            print(f"updated list of peers: {self.peer_sockets}\n")
         
     def _trackerNodeComm(self):
         """
@@ -127,19 +127,20 @@ class PeerNetwork:
         while True:
             for socket in self.peer_sockets:
                 socket.sendall("OK".encode())
-                socket.settimeout(5)  # set time for client to respond to tracker's query
-                try:
-                    decoded_data = socket.recv(1024).decode()
-                    if not (decoded_data in self.peers):  # client is new
-                        self.peers.append(decoded_data)
-                        self.dict[socket] = decoded_data
-                        print(f"new peer joined: {decoded_data}\n")
-                        socket.sendall(",".join(self.peers).encode())  # send updated list of peers
-                except socket.timeout:  # client has left
+                decoded_data = socket.recv(1024).decode()
+                if decoded_data == "":  # client has left
                     self.peer_sockets.remove(socket)
                     self.peers.remove(self.dict[socket])
                     print(f"peer left: {self.dict[socket]}\n")
                     socket.sendall(",".join(self.peers).encode())  # send updated list of peers
+                    print(f"updated list of peers sent: {self.peers}")
+                elif not decoded_data in self.peers:  # client is new
+                    self.peers.append(decoded_data)
+                    self.dict[socket] = decoded_data
+                    print(f"new peer joined: {decoded_data}\n")
+                    socket.sendall(",".join(self.peers).encode())  # send updated list of peers
+                    print(f"updated list of peers sent: {self.peers}")
+                    
         
 
 if __name__ == "__main__":
