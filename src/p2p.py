@@ -5,6 +5,7 @@ import sys
 import threading
 import json
 import queue
+import datetime
 
 """
 inspired by bitorrent p2p architecture
@@ -25,7 +26,10 @@ tracker node:
 - when a node leaves: timer runs out and knows the node exited -- remove address from the list
 
 """
-
+def datetime_serializer(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+        
 class MsgQueue:
     def __init__(self):
         self.queue = queue.Queue()
@@ -133,7 +137,7 @@ class PeerNetwork:
                 last_block = self.blockchain.get_last_block()
                 last_block.print_block()
                 new_block = Block(last_block.block_number + 1, msg, last_block.prev_hash)  # create block from message
-                block_to_send = json.dumps(new_block.__dict__)
+                block_to_send = json.dumps(new_block.__dict__, default=datetime_serializer)
                 print(f"sending new block from {self.ip} to {send_sock}")
                 send_sock.sendall(block_to_send.encode())  # send given data to peers  
 
