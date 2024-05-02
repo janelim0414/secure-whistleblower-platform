@@ -93,6 +93,7 @@ class PeerNetwork:
                         s = socket(AF_INET, SOCK_STREAM)
                         s.connect((peer, self.port)) 
                         self.peer_sockets.append(s)
+                        self.peer.append(peer)
                 print(f"updated list of peers: {self.peers}\n")
     
     def _send(self, block):
