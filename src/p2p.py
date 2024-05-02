@@ -120,29 +120,48 @@ class PeerNetwork:
         
     def _trackerNodeComm(self):
         """
-        ensures client (each peer) is active in the network
+        Ensure each peer is active in the network.
 
-        if client is new, add its ip addres to list of peers and broadcast to others
-        if client has left the network (timeout detected), remove its ip address from the list and broadcast to others
+        If a peer is new, add its IP address to the list of peers and broadcast to others.
+        If a peer has left the network (timeout detected), remove its IP address from the list and broadcast to others.
         """
         while True:
             for socket in self.peer_sockets:
-                socket.sendall("OK".encode())
-                decoded_data = socket.recv(1024).decode()
-                if decoded_data == "":  # client has left
-                    self.peer_sockets.remove(socket)
-                    self.peers.remove(self.dict[socket])
-                    print(f"peer left: {self.dict[socket]}\n")
-                    for s in self.peer_sockets:
-                        s.sendall(",".join(self.peers).encode())  # send updated list of peers
-                        print(f"updated list of peers sent to {s}: {self.peers}")
-                elif not decoded_data in self.peers:  # client is new
-                    self.peers.append(decoded_data)
-                    self.dict[socket] = decoded_data
-                    print(f"new peer joined: {decoded_data}\n")
-                    for s in self.peer_sockets:
-                        s.sendall(",".join(self.peers).encode())  # send updated list of peers
-                        print(f"updated list of peers sent to {s}: {self.peers}")
+                try:
+                    socket.sendall("OK".encode())
+                    decoded_data = socket.recv(1024).decode()
+                    if decoded_data == "":  # Peer has left
+                        self._handlePeerLeave(socket)
+                    elif decoded_data not in self.peers:  # Peer is new
+                        self._handleNewPeer(socket, decoded_data)
+                except ConnectionResetError:
+                    # Handle the case where the peer disconnects abruptly
+                    self._handlePeerLeave(socket)
+
+    def _handlePeerLeave(self, socket):
+        """
+        Handle the scenario where a peer leaves the network.
+        """
+        self.peer_sockets.remove(socket)
+        if socket in self.dict:
+            peer_ip = self.dict[socket]
+            self.peers.remove(peer_ip)
+            print(f"Peer left: {peer_ip}\n")
+            for s in self.peer_sockets:
+                s.sendall(",".join(self.peers).encode())  # Send updated list of peers
+                print(f"Updated list of peers sent to {s}: {self.peers}")
+        del self.dict[socket]
+
+    def _handleNewPeer(self, socket, peer_ip):
+        """
+        Handle the scenario where a new peer joins the network.
+        """
+        self.peers.append(peer_ip)
+        self.dict[socket] = peer_ip
+        print(f"New peer joined: {peer_ip}\n")
+        for s in self.peer_sockets:
+            s.sendall(",".join(self.peers).encode())  # Send updated list of peers
+            print(f"Updated list of peers sent to {s}: {self.peers}")
         
 
 if __name__ == "__main__":
