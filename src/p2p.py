@@ -40,7 +40,7 @@ class MsgQueue:
         return self.queue.empty()
 
 class PeerNetwork:
-    def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int, msg_q: str) -> None:
+    def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int, msg_q: MsgQueue) -> None:
         self.peers = []
         self.peer_sockets = []
         self.recv_sockets = []
@@ -91,6 +91,7 @@ class PeerNetwork:
                 print(f"Client disconnected: {client_socket}")
                 break
             new_block = json.loads(new_block)
+            new_block = Block(**new_block)
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
@@ -132,7 +133,7 @@ class PeerNetwork:
                 last_block = self.blockchain.get_last_block()
                 last_block.print_block()
                 new_block = Block(last_block.block_number + 1, msg, last_block.prev_hash)  # create block from message
-                block_to_send = json.dumps(new_block)
+                block_to_send = json.dumps(new_block.__dict__)
                 print(f"sending new block from {self.ip} to {send_sock}")
                 send_sock.sendall(block_to_send.encode())  # send given data to peers  
 
