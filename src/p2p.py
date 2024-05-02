@@ -132,15 +132,16 @@ class PeerNetwork:
                     self.peer_sockets.remove(socket)
                     self.peers.remove(self.dict[socket])
                     print(f"peer left: {self.dict[socket]}\n")
-                    socket.sendall(",".join(self.peers).encode())  # send updated list of peers
-                    print(f"updated list of peers sent: {self.peers}")
+                    for s in self.peer_sockets:
+                        s.sendall(",".join(self.peers).encode())  # send updated list of peers
+                        print(f"updated list of peers sent to {s}: {self.peers}")
                 elif not decoded_data in self.peers:  # client is new
                     self.peers.append(decoded_data)
                     self.dict[socket] = decoded_data
                     print(f"new peer joined: {decoded_data}\n")
-                    socket.sendall(",".join(self.peers).encode())  # send updated list of peers
-                    print(f"updated list of peers sent: {self.peers}")
-                    
+                    for s in self.peer_sockets:
+                        s.sendall(",".join(self.peers).encode())  # send updated list of peers
+                        print(f"updated list of peers sent to {s}: {self.peers}")
         
 
 if __name__ == "__main__":
