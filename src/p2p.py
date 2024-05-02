@@ -37,7 +37,7 @@ class MsgQueue:
         return self.queue.get()
     
     def queue_empty(self):
-        return self.queue.isEmpty()
+        return self.queue.empty()
 
 class PeerNetwork:
     def __init__(self, is_tracker: bool, tracker_addr: str, tracker_port: int, msg_q: str) -> None:
@@ -77,7 +77,8 @@ class PeerNetwork:
             print(f"Client connected from: {client_address}")
 
             threading.Thread(target=self._receive, args=(client_socket,)).start()  # create a thread for each peer connection (recv channel)
-    
+              # create a thread for each peer connection (recv channel)
+
     def _receive(self, client_socket):
         """
         receive data from each peer/client connection
@@ -114,11 +115,12 @@ class PeerNetwork:
                         s = socket(AF_INET, SOCK_STREAM)
                         s.connect((peer, self.port)) 
                         self.peer_sockets.append(s)
+                        threading.Thread(target=self._send, args=(s,)).start()
                 new_peers.remove(self.ip)
                 self.peers = new_peers
                 print(f"updated list of peers: {self.peers}\n")
     
-    def _send(self):
+    def _send(self, send_sock):
         """
         send to each peer/server connection
         """
@@ -129,9 +131,8 @@ class PeerNetwork:
                 last_block.print_block()
                 new_block = Block(last_block.block_number + 1, msg, last_block.prev_hash)  # create block from message
                 block_to_send = json.dumps(new_block)
-                for sock in self.peer_sockets:
-                    print(f"sending new block from {self.ip} to {sock}")
-                    sock.sendall(block_to_send.encode())  # send given data to peers  
+                print(f"sending new block from {self.ip} to {send_sock}")
+                send_sock.sendall(block_to_send.encode())  # send given data to peers  
 
     def _handleTracker(self):
         if self.tracker_addr != self.ip:
