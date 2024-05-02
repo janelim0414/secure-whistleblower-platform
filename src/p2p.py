@@ -81,14 +81,13 @@ class PeerNetwork:
     def _nodeTrackerComm(self):
         while True:
             decoded_data = self.socket.recv(1024).decode()  # receive data from tracker
-            print(decoded_data)
             # handle query from tracker
             if decoded_data == "OK":  
                 self.socket.sendall(self.ip.encode())  # send ip address
             # save updated list of peers from tracker
             else:  
                 new_peers = decoded_data.split(",")
-                print(decoded_data)
+                print(new_peers)
                 for peer in new_peers:
                     if not peer in self.peers:
                         s = socket(AF_INET, SOCK_STREAM)
