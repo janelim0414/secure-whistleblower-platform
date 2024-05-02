@@ -109,11 +109,13 @@ class PeerNetwork:
             # save updated list of peers from tracker
             else:  
                 new_peers = decoded_data.split(",")
-                print(new_peers)
+                print(f"list of peers: {self.peers}")
+                print(f"received from tracker: {new_peers}")
                 for peer in new_peers:
-                    if not peer in self.peers and peer != self.ip:
+                    if (not peer in self.peers) and (peer != self.ip):
                         s = socket(AF_INET, SOCK_STREAM)
                         s.connect((peer, self.port)) 
+                        print(f"send channel connected from: {peer}")
                         self.peer_sockets.append(s)
                         threading.Thread(target=self._send, args=(s,)).start()
                 new_peers.remove(self.ip)
