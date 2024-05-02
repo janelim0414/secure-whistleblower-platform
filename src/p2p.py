@@ -71,6 +71,7 @@ class PeerNetwork:
                 client_socket.close()
                 self.recv_sockets.remove(client_socket)
                 print(f"Client disconnected: {client_socket}")
+                continue
             new_block_hash = new_block.mine('0000')
             try:
                 # add incoming block to this blockchain
