@@ -136,6 +136,8 @@ class PeerNetwork:
                         self._handleNewPeer(socket, decoded_data)
                 except ConnectionResetError:
                     # Handle the case where the peer disconnects abruptly
+                    print(self.peer_sockets)
+                    print(self.peers)
                     self._handlePeerLeave(socket)
 
     def _handlePeerLeave(self, socket):
