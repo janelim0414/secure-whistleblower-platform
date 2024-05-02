@@ -89,7 +89,7 @@ class PeerNetwork:
                 new_peers = decoded_data.split(",")
                 print(new_peers)
                 for peer in new_peers:
-                    if not (peer in self.peers):
+                    if not peer in self.peers and peer != self.ip:
                         s = socket(AF_INET, SOCK_STREAM)
                         s.connect((peer, self.port)) 
                         self.peer_sockets.append(s)
