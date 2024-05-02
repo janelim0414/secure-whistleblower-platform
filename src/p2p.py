@@ -5,7 +5,7 @@ import sys
 import threading
 import json
 import queue
-import datetime
+from datetime import datetime
 
 """
 inspired by bitorrent p2p architecture
