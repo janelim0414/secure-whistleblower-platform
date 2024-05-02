@@ -152,7 +152,7 @@ class PeerNetwork:
             for s in self.peer_sockets:
                 s.sendall(",".join(self.peers).encode())  # Send updated list of peers
                 print(f"Updated list of peers sent to {s}: {self.peers}")
-        del self.dict[socket]
+            del self.dict[socket]
 
     def _handleNewPeer(self, socket, peer_ip):
         """
