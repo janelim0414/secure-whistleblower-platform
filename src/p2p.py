@@ -115,6 +115,7 @@ class PeerNetwork:
                 chain.hash_requirement = chain_data["hash_requirement"]
                 print(f"received blockchain: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
+                    print("updated this chain")
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
             elif header == "b":  # new block added by other peer
