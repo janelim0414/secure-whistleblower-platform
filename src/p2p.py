@@ -108,7 +108,7 @@ class PeerNetwork:
                     blocks.append(block)
                 chain_data["chain"] = blocks
                 chain = Blockchain(**chain_data)
-                print(f"received blockchain: {chain}")
+                print(f"received blockchain: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
@@ -129,6 +129,7 @@ class PeerNetwork:
                 except Exception as e:
                     print(e)
             print("current chain:")
+            print(self.blockchain.chain)
             self.blockchain.print_chain()
             print(f"most recent hash: {self.blockchain.most_recent_hash}")
 
