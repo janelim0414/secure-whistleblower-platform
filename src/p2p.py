@@ -103,17 +103,12 @@ class PeerNetwork:
                 chain_data = client_socket.recv(1024).decode() 
                 chain_data = json.loads(chain_data)
                 print(f"chain received: {chain_data}")
+                chain = Blockchain(**chain_data)
                 blocks = []
                 for block_data in chain_data["chain"]:
                     block = Block(**block_data)
-                    block.print_block()
                     blocks.append(block)
-                # manually deserialize blockchain
-                chain = Blockchain()
                 chain.chain = blocks
-                chain.block_number = chain_data["block_number"]
-                chain.most_recent_hash = chain_data["most_recent_hash"]
-                chain.hash_requirement = chain_data["hash_requirement"]
                 print(f"received blockchain: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     print("updated this chain")
