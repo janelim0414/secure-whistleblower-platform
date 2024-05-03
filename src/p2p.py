@@ -115,6 +115,7 @@ class PeerNetwork:
                     print(e)
             print("current chain:")
             self.blockchain.print_chain()
+            print(f"most recent hash: {self.blockchain.most_recent_hash}")
 
     def _nodeTrackerComm(self):
         """
