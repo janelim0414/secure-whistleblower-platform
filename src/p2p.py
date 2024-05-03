@@ -150,6 +150,7 @@ class PeerNetwork:
                         # send chain of this node to newly joined node
                         chain_data = json.dumps(self.blockchain.__dict__, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
+                        print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode)}")
                         s.sendall(header + chain_data.encode())
                         # start thread for sending blocks for this peer
                         threading.Thread(target=self._send, args=(s,)).start()
