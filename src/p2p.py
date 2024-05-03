@@ -150,9 +150,9 @@ class PeerNetwork:
                         self.peer_sockets.append(s)
                         # send chain of this node to newly joined node
                         chain_dict = self.blockchain.__dict__
-                        for i in range(0, len(chain_dict['chain']) - 1):
+                        for i in range(0, len(chain_dict['chain'])):
                             block = chain_dict['chain'][i]
-                            chain_dict['chain'][i] = json.dumps(block.__dict__, default=datetime_serializer)
+                            chain_dict['chain'][i] = block.__dict__
                         chain_data = json.dumps(chain_dict, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
                         print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
