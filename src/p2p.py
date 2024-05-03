@@ -6,6 +6,7 @@ import threading
 import json
 import queue
 from datetime import datetime
+import copy
 
 """
 inspired by bitorrent p2p architecture
@@ -162,14 +163,14 @@ class PeerNetwork:
                         print(f"send channel connected from: {peer}")
                         self.peer_sockets.append(s)
                         # send chain of this node to newly joined node
-                        chain_dict = self.blockchain.__dict__
-                        for i in range(0, len(chain_dict['chain'])):
-                            block = chain_dict['chain'][i]
-                            chain_dict['chain'][i] = block.__dict__
-                        chain_data = json.dumps(chain_dict, default=datetime_serializer)
+                        chain_copy = copy.deepcopy(self.blockchain)
+                        for i in range(len(chain_copy.chain)):
+                            block = chain_copy.chain[i]
+                            chain_copy.chain[i] = block.__dict__
+                        chain_data = json.dumps(chain_copy.__dict__, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
                         print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
-                        print(f"dict data sent: {chain_dict}")
+                        print(f"dict data sent: {chain_copy.__dict__}")
                         s.sendall(header + chain_data.encode())
                         # start thread for sending blocks for this peer
                         threading.Thread(target=self._send, args=(s,)).start()
