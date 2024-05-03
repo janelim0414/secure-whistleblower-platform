@@ -104,6 +104,7 @@ class PeerNetwork:
                 print(f"chain received: {chain_data}")
                 blocks = []
                 for block_data in chain_data["chain"]:
+                    block_data = json.loads(block_data)
                     block = Block(**block_data)
                     block.print_block()
                     blocks.append(block)
@@ -164,11 +165,11 @@ class PeerNetwork:
                         chain_dict = self.blockchain.__dict__
                         for i in range(0, len(chain_dict['chain'])):
                             block = chain_dict['chain'][i]
-                            chain_dict['chain'][i] = block.__dict__
+                            chain_dict['chain'][i] = json.dumps(block.__dict__, default=datetime_serializer)
                         chain_data = json.dumps(chain_dict, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
                         print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
-                        print(f"dict data sent: {self.blockchain.__dict__}")
+                        print(f"dict data sent: {chain_dict}")
                         s.sendall(header + chain_data.encode())
                         # start thread for sending blocks for this peer
                         threading.Thread(target=self._send, args=(s,)).start()
