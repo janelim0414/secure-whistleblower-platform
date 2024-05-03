@@ -108,6 +108,13 @@ class PeerNetwork:
                 new_block = client_socket.recv(1024).decode() 
                 new_block = json.loads(new_block)
                 new_block = Block(**new_block)
+                print(f"new block's nonce: {new_block.nonce}")
+                print(f"new block's hash: {new_block.curr_hash}")
+                print(f"new block's hash computed again: {new_block.get_hash(new_block.nonce)}")
+                print(f"this blockchain's hash requirement: {self.blockchain.hash_requirement}")
+                print(f"new block's current hash: {new_block.curr_hash}")
+                print(f"new block's prev hash: {new_block.prev_hash}")
+                print(f"this blockchain's most recent hash: {self.blockchain.most_recent_hash}")
                 try:
                     # add incoming block to this blockchain
                     self.blockchain.add_block(new_block, new_block.curr_hash)
