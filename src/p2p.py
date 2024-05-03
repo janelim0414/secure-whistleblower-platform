@@ -99,14 +99,16 @@ class PeerNetwork:
                 print(f"Client disconnected: {client_socket}")
                 break
             if header == "c":  # chain received from peers
-                chain = client_socket.recv(1024).decode() 
-                chain = json.loads(chain)
-                print(f"chain received: {chain}")
-                chain = Blockchain(**chain)
-                for i in range(0, len(chain.chain)):
-                    block_dict = chain.chain[i]
-                    chain.chain[i] = Block(**block_dict)
-                    print(f"deserialized block: {chain.chain[i]}")
+                chain_data = client_socket.recv(1024).decode() 
+                chain_data = json.loads(chain_data)
+                print(f"chain received: {chain_data}")
+                blocks = []
+                for block_data in chain_data["chain"]:
+                    block = Block(**block_data)
+                    blocks.append(block)
+                chain_data["chain"] = blocks
+                chain = Blockchain(**chain_data)
+                print(f"received blockchain: {chain}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
