@@ -9,23 +9,22 @@ from datetime import datetime
 import copy
 
 """
-inspired by bitorrent p2p architecture
-
 new node:
 - new node signals tracker by sending its ip address
 - new node creates TCP connections with node information received from tracker node
-- 
+- new node receives longest chain from peers upon joining
 
 peer nodes:
 - each peer node periodically notifies tracker of its membership
 - maintains blockchain and send/receive blocks over TCP
 - two threads for receive() and send() -- is both a server and a client
+- each peer sends its chain to new node
+- send new block to all peers
 
 tracker node:
 - default behavior: keeps a timer for each peer node
-- when new node joins: records ip addresses of new nodes and randomly sends subset of ip addresses of registered nodes
-- when a node leaves: timer runs out and knows the node exited -- remove address from the list
-
+- when new node joins: records ip addresses of new nodes and sends ip addresses of registered nodes
+- when a node leaves: no response from peer and knows the node exited -- remove address from the list
 """
 def datetime_serializer(obj):
     if isinstance(obj, datetime):
