@@ -103,6 +103,9 @@ class PeerNetwork:
                 chain = json.loads(chain)
                 print(f"chain received: {chain}")
                 chain = Blockchain(**chain)
+                for i in range(0, len(chain.chain)):
+                    block_dict = chain.chain[i]
+                    chain.chain[i] = json.loads(block_dict)
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
