@@ -108,7 +108,7 @@ class PeerNetwork:
                 new_block = client_socket.recv(1024).decode() 
                 new_block = json.loads(new_block)
                 new_block = Block(**new_block)
-                print(f"new block's nonce: {new_block.nonce}")
+                print(f"new block's nonce: {new_block.nonce}, type {type(new_block.nonce)}")
                 print(f"new block's hash: {new_block.curr_hash}")
                 print(f"new block's hash computed again: {new_block.get_hash(new_block.nonce)}")
                 print(f"this blockchain's hash requirement: {self.blockchain.hash_requirement}")
