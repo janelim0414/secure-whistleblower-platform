@@ -169,7 +169,7 @@ class PeerNetwork:
                 # add block to this node's chain
                 last_block = self.blockchain.get_last_block()
                 last_block.print_block()
-                new_block = Block(last_block.block_number + 1, msg, last_block.prev_hash)  # create block from message
+                new_block = Block(last_block.block_number + 1, msg[0], last_block.prev_hash)  # create block from message
                 new_hash = new_block.mine('0000')  # get hash to verify block
                 try:
                     self.blockchain.add_block(new_block, new_hash)  # add to this node's chain as requested
