@@ -254,6 +254,6 @@ if __name__ == "__main__":
 
     print("here")
     if not is_tracker:
-        msg_q.put_msg('block 1 data from ', '')
+        msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
 
 
