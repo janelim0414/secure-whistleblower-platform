@@ -105,8 +105,7 @@ class PeerNetwork:
                 chain = Blockchain(**chain)
                 for i in range(0, len(chain.chain)):
                     block_dict = chain.chain[i]
-                    block_data = json.loads(block_dict)
-                    chain.chain[i] = Block(**block_data)
+                    chain.chain[i] = Block(**block_dict)
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
@@ -156,7 +155,7 @@ class PeerNetwork:
                         chain_dict = self.blockchain.__dict__
                         for i in range(0, len(chain_dict['chain'])):
                             block = chain_dict['chain'][i]
-                            chain_dict['chain'][i] = json.dumps(block.__dict__, default=datetime_serializer)
+                            chain_dict['chain'][i] = block.__dict__
                         chain_data = json.dumps(chain_dict, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
                         print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
