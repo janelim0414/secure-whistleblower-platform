@@ -101,6 +101,7 @@ class PeerNetwork:
             if header == "c":  # chain received from peers
                 chain = client_socket.recv(1024).decode() 
                 chain = json.loads(chain)
+                print(f"chain received: {chain}")
                 chain = Blockchain(**chain)
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
