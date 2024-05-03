@@ -176,7 +176,7 @@ class PeerNetwork:
                 except Exception as e:
                     print(e)
                 print(f"block added to {self.ip} per request:")
-                self.blockchain.print_chain
+                self.blockchain.print_chain()
                 # send block to peers
                 block_to_send = json.dumps(new_block.__dict__, default=datetime_serializer)
                 header = "b".encode()  # "b" for block
