@@ -102,8 +102,8 @@ class PeerNetwork:
                 self.blockchain.add_block(new_block, new_block_hash)
             except Exception as e:
                 print(e)
-            print("added a block: \n")
-            self.blockchain.get_last_block().print_block()
+            print("current chain:")
+            self.blockchain.print_chain()
 
     def _nodeTrackerComm(self):
         while True:
