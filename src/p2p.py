@@ -105,6 +105,7 @@ class PeerNetwork:
                 blocks = []
                 for block_data in chain_data["chain"]:
                     block = Block(**block_data)
+                    block.print_block()
                     blocks.append(block)
                 chain_data["chain"] = blocks
                 chain = Blockchain(**chain_data)
