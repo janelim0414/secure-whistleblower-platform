@@ -102,13 +102,13 @@ class PeerNetwork:
                 chain_data = client_socket.recv(1024).decode() 
                 chain_data = json.loads(chain_data)
                 print(f"chain received: {chain_data}")
+                chain = Blockchain(**chain_data)
                 blocks = []
                 for block_data in chain_data["chain"]:
                     block = Block(**block_data)
                     block.print_block()
                     blocks.append(block)
-                chain_data["chain"] = blocks
-                chain = Blockchain(**chain_data)
+                chain.chain = blocks
                 print(f"received blockchain: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
