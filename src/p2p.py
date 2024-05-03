@@ -98,22 +98,25 @@ class PeerNetwork:
                 self.recv_sockets.remove(client_socket)
                 print(f"Client disconnected: {client_socket}")
                 break
-            if header == "c":  # chain received from peers
+            elif header == "c":  # chain received from peers
                 chain_data = client_socket.recv(1024).decode() 
                 chain_data = json.loads(chain_data)
                 print(f"chain received: {chain_data}")
-                chain = Blockchain(**chain_data)
+                chain = Blockchain()
                 blocks = []
                 for block_data in chain_data["chain"]:
                     block = Block(**block_data)
                     block.print_block()
                     blocks.append(block)
                 chain.chain = blocks
+                chain.block_number = chain_data["block_number"]
+                chain.most_recent_hash = chain_data["most_recent_hash"]
+                chain.hash_requirement = chain_data["hash_requirement"]
                 print(f"received blockchain: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
-            if header == "b":  # new block added by other peer
+            elif header == "b":  # new block added by other peer
                 new_block = client_socket.recv(1024).decode() 
                 new_block = json.loads(new_block)
                 new_block = Block(**new_block)
