@@ -104,6 +104,7 @@ class PeerNetwork:
                 chain = Blockchain(**chain)
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
+                    self.blockchain.print_chain()
             if header == "b":  # new block added by other peer
                 new_block = client_socket.recv(1024).decode() 
                 new_block = json.loads(new_block)
