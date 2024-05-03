@@ -1,7 +1,7 @@
 from block import Block
 
 class Blockchain:
-    def __init__(self):
+    def __init__(self, chain=None, block_number=None, most_recent_hash=None, hash_requirement=None):
         """
         initialize a blockchain
         
@@ -11,10 +11,22 @@ class Blockchain:
         most_recent_hash - 
         hash_requirement - 
         """
-        self.chain = [self.create_genesis_block()]
-        self.block_number = 1
-        self.most_recent_hash = '0'
-        self.hash_requirement = '0000'  # a hash is valid only if the first four characters exactly match the hash_difficulty
+        if chain:
+            self.chain = chain
+        else:
+            self.chain = [self.create_genesis_block()]
+        if block_number:
+            self.block_number = block_number
+        else:
+            self.block_number = 1
+        if most_recent_hash:
+            self.most_recent_hash = most_recent_hash
+        else:
+            self.most_recent_hash = '0'
+        if hash_requirement:
+            self.hash_requirement = hash_requirement
+        else:
+            self.hash_requirement = '0000'  # a hash is valid only if the first four characters exactly match the hash_difficulty
 
     def create_genesis_block(self):
         """
