@@ -106,6 +106,7 @@ class PeerNetwork:
                 for i in range(0, len(chain.chain)):
                     block_dict = chain.chain[i]
                     chain.chain[i] = Block(**block_dict)
+                    print(f"deserialized block: {chain.chain[i]}")
                 if len(chain.chain) > len(self.blockchain.chain):
                     self.blockchain = chain  # update chain with longest 
                     self.blockchain.print_chain()
