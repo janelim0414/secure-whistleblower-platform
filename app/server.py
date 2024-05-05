@@ -9,11 +9,14 @@ from blockchain import Blockchain
 from p2p import PeerNetwork, MsgQueue
 from block import Block
 
-# Initialize the blockchain
+# Initialize the blockchain and P2P network
 blockchain = Blockchain()
+msg_q = MsgQueue()
+peer_network = None
+
 app = Flask(__name__)
 
-# The basic HTML template for the home page
+# HTML template for the home page
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
@@ -42,13 +45,13 @@ function fetchBlockchain() {
         });
 }
 
-setInterval(fetchBlockchain, 5000);  // Update every 5000 milliseconds (5 seconds)
+setInterval(fetchBlockchain, 1000);  // Update every 1000 milliseconds (1 second)
 </script>
 </html>
 """
+
 @app.route('/', methods=['GET'])
 def home():
-    # Display the blockchain
     blockchain_data = blockchain.print_chain()
     if not blockchain_data.strip():
         blockchain_data = "No blocks in the blockchain."
@@ -61,28 +64,25 @@ def submit():
         last_block = blockchain.get_last_block()
         new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
         new_block_hash = new_block.mine('0000')  # Assuming a difficulty level of '0000'
-        try:
-            blockchain.add_block(new_block, new_block_hash)
-            response_message = 'New block added successfully!'
-        except Exception as e:
-            response_message = str(e)
-        # return jsonify({'message': response_message, 'hash': new_block_hash if 'added' in response_message else 'N/A'}), 200
+        blockchain.add_block(new_block, new_block_hash)
+        # Broadcast the new block to peers
+        msg_q.put_msg((new_block.to_dict(), 'broadcast'))  # Assuming to_dict() method serializes the block
         return home()
     else:
-        # return jsonify({'error': 'No message provided'}), 400
         return home()
 
-# def run_p2p_network():
-#     msg_q = MsgQueue()
-#     is_tracker = False
-#     tracker_addr = 'localhost'  # Example address
-#     tracker_port = 8000  # Example port
-#     peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
-#     peer_network_thread = threading.Thread(target=peer_network.run)
-#     peer_network_thread.start()
+def run_p2p_network():
+    try:
+        global peer_network
+        is_tracker = False  # Adjust based on whether this node is the tracker
+        tracker_addr = '10.128.0.5' 
+        tracker_port = 8000  # Example port
+        peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
+        peer_network_thread = threading.Thread(target=peer_network.run)
+        peer_network_thread.start()
+    except Exception as e:
+        print(f"Error running P2P network: {e}")
 
 if __name__ == '__main__':
-    # Run P2P network in the background
-    # threading.Thread(target=run_p2p_network).start()
-    # Start Flask app
+    threading.Thread(target=run_p2p_network).start()
     app.run(debug=True)
