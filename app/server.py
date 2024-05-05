@@ -102,4 +102,4 @@ if __name__ == '__main__':
     tracker_addr = sys.argv[1]
     is_tracker = bool(int(sys.argv[2]))
     threading.Thread(target=run_p2p_network, args=(is_tracker, tracker_addr, )).start()
-    app.run(debug=True, port=find_available_port())
+    app.run(debug=False, port=find_available_port())
