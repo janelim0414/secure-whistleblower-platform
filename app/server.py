@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template_string, jsonify
+from flask_socketio import SocketIO, emit
 import sys
 import os
 import threading
@@ -15,6 +16,7 @@ msg_q = MsgQueue()
 peer_network = None
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # HTML template for the home page
 HTML_TEMPLATE = """
@@ -33,22 +35,22 @@ HTML_TEMPLATE = """
     <h2>Blockchain:</h2>
     <pre id="blockchainDisplay">{{ blockchain }}</pre>
 </body>
-# <script>
-# function fetchBlockchain() {
-#     fetch('/')
-#         .then(response => response.text())
-#         .then(html => {
-#             var parser = new DOMParser();
-#             var doc = parser.parseFromString(html, 'text/html');
-#             var blockchainData = doc.querySelector('pre').innerText;
-#             document.getElementById('blockchainDisplay').innerText = blockchainData;
-#         });
-# }
-
-# setInterval(fetchBlockchain, 1000);  // Update every 1000 milliseconds (1 second)
-# </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+<script>
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+socket.on('update_blockchain', function(data) {
+    document.getElementById('blockchainDisplay').innerText = data.blockchain;
+});
+</script>
 </html>
 """
+
+@socketio.on('connect')
+def test_connect():
+    emit('after connect',  {'data':'Connected'})
+
+def notify_flask_app_of_update():
+    socketio.emit('update_blockchain', {'blockchain': blockchain.print_chain()})
 
 @app.route('/', methods=['GET'])
 def home():
@@ -79,7 +81,7 @@ def submit():
 def run_p2p_network():
     try:
         global peer_network
-        is_tracker = False  # True for tracker node
+        is_tracker = False  # TODO: change to True for tracker node
         tracker_addr = '10.128.0.5' 
         tracker_port = 8000 
         peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
@@ -90,4 +92,4 @@ def run_p2p_network():
 
 if __name__ == '__main__':
     threading.Thread(target=run_p2p_network).start()
-    app.run(debug=True, port='5002')
+    app.run(debug=True, port='5002') # TODO: change to other ports for different nodes
