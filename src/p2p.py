@@ -52,6 +52,7 @@ class PeerNetwork:
         self.peers = []
         self.peer_sockets = []
         self.recv_sockets = []
+        self.is_tracker = is_tracker
         self.tracker_addr = tracker_addr
         self.port = tracker_port
         self.hostname = gethostname()
@@ -62,7 +63,9 @@ class PeerNetwork:
         self.msg_q = msg_q
         self.blockchain = Blockchain()
         self.dict = {}  # maps ip to tracker socket connection
-        if is_tracker:
+
+    def run(self):
+        if self.is_tracker:
             self._handleTracker()
         else:
             self._handleNode()
@@ -281,5 +284,3 @@ if __name__ == "__main__":
     # print("here")
     # if not is_tracker:
     #     msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
-
-
