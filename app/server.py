@@ -92,4 +92,4 @@ def run_p2p_network():
 
 if __name__ == '__main__':
     threading.Thread(target=run_p2p_network).start()
-    app.run(debug=True, port='5002') # TODO: change to other ports for different nodes
+    app.run(debug=True, port='5002') # TODO: if port is taken, change to other ports for different nodes
