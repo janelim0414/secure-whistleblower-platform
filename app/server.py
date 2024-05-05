@@ -82,7 +82,7 @@ def run_p2p_network():
     try:
         global peer_network
         is_tracker = False  # TODO: change to True for tracker node
-        tracker_addr = '10.128.0.5' 
+        tracker_addr = '10.128.0.5' # TODO: change to internal IP addr of tracker node
         tracker_port = 8000 
         peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
         peer_network_thread = threading.Thread(target=peer_network.run)
