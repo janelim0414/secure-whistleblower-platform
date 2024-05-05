@@ -278,8 +278,8 @@ if __name__ == "__main__":
     peer_network_thread = threading.Thread(target=run_p2p_net, args=(msg_q,))
     peer_network_thread.start()
 
-    print("here")
-    if not is_tracker:
-        msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
+    # print("here")
+    # if not is_tracker:
+    #     msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
 
 
