@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, emit
 import sys
 import os
 import threading
+import socket
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
@@ -78,18 +79,27 @@ def submit():
     else:
         return home()
 
-def run_p2p_network():
+def run_p2p_network(is_tracker, tracker_addr):
     try:
         global peer_network
-        is_tracker = False  # TODO: change to True for tracker node
-        tracker_addr = '10.128.0.5' # TODO: change to internal IP addr of tracker node
-        tracker_port = 8000 
+        tracker_port = 8000
         peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
         peer_network_thread = threading.Thread(target=peer_network.run)
         peer_network_thread.start()
     except Exception as e:
         print(f"Error running P2P network: {e}")
 
+
+def find_available_port():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('localhost', 0))
+    port = sock.getsockname()[1]
+    sock.close()
+    return port
+
+
 if __name__ == '__main__':
-    threading.Thread(target=run_p2p_network).start()
-    app.run(debug=True, port='5002') # TODO: if port is taken, change to other ports for different nodes
+    tracker_addr = sys.argv[1]
+    is_tracker = bool(int(sys.argv[2]))
+    threading.Thread(target=run_p2p_network, args=(is_tracker, tracker_addr, )).start()
+    app.run(debug=True, port=find_available_port())
