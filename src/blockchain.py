@@ -11,6 +11,11 @@ class Blockchain:
         most_recent_hash - 
         hash_requirement - 
         """
+        if hash_requirement:
+            self.hash_requirement = hash_requirement
+        else:
+            self.hash_requirement = '0000'  # a hash is valid only if the first four characters exactly match the hash_difficulty
+
         if chain:
             self.chain = chain
         else:
@@ -23,16 +28,15 @@ class Blockchain:
             self.most_recent_hash = most_recent_hash
         else:
             self.most_recent_hash = '0'
-        if hash_requirement:
-            self.hash_requirement = hash_requirement
-        else:
-            self.hash_requirement = '0000'  # a hash is valid only if the first four characters exactly match the hash_difficulty
 
     def create_genesis_block(self):
         """
         create a dummy head for the block chain
         """
-        return Block(1, 'Genesis', '0')
+        genesis_block = Block(1, 'Genesis', '0')
+        genesis_block.mine(self.hash_requirement)
+        self.most_recent_hash = genesis_block.curr_hash
+        return genesis_block
     
     def valid_proof(self, new_block, new_block_hash):
         return new_block_hash.startswith(self.hash_requirement) and new_block_hash == new_block.get_hash(new_block.nonce)
@@ -65,5 +69,4 @@ class Blockchain:
         """
         a debugging function that print the whole chain
         """
-        for block in self.get_chain():
-            block.print_block()
+        return '\n'.join(str(block) for block in self.get_chain())
