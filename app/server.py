@@ -33,24 +33,22 @@ HTML_TEMPLATE = """
     <h2>Blockchain:</h2>
     <pre id="blockchainDisplay">{{ blockchain }}</pre>
 </body>
-<script>
-function fetchBlockchain() {
-    fetch('/')
-        .then(response => response.text())
-        .then(html => {
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(html, 'text/html');
-            var blockchainData = doc.querySelector('pre').innerText;
-            document.getElementById('blockchainDisplay').innerText = blockchainData;
-        });
-}
+# <script>
+# function fetchBlockchain() {
+#     fetch('/')
+#         .then(response => response.text())
+#         .then(html => {
+#             var parser = new DOMParser();
+#             var doc = parser.parseFromString(html, 'text/html');
+#             var blockchainData = doc.querySelector('pre').innerText;
+#             document.getElementById('blockchainDisplay').innerText = blockchainData;
+#         });
+# }
 
-setInterval(fetchBlockchain, 1000);  // Update every 1000 milliseconds (1 second)
-</script>
+# setInterval(fetchBlockchain, 1000);  // Update every 1000 milliseconds (1 second)
+# </script>
 </html>
 """
-
-# peers = ['10.128.0.3', '10.128.0.4', '10.128.0.6']
 
 @app.route('/', methods=['GET'])
 def home():
@@ -64,7 +62,10 @@ def submit():
     message = request.form['message']
     if message:
         last_block = blockchain.get_last_block()
-        new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
+        if last_block.block_number == 1:
+            new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
+        else:
+            new_block = Block(last_block.block_number + 1, message, last_block.curr_hash)
         new_block_hash = new_block.mine('0000')
         blockchain.add_block(new_block, new_block_hash)
         if peer_network is not None:
@@ -89,4 +90,4 @@ def run_p2p_network():
 
 if __name__ == '__main__':
     threading.Thread(target=run_p2p_network).start()
-    app.run(debug=True)
+    app.run(debug=True, port='5002')
