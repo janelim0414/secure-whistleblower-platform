@@ -67,9 +67,11 @@ def submit():
         new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
         new_block_hash = new_block.mine('0000')
         blockchain.add_block(new_block, new_block_hash)
-        # Broadcast the new block to peers
-        msg_q.put_msg((new_block.to_dict(), '10.128.0.4'))
-        msg_q.put_msg((new_block.to_dict(), '10.128.0.6'))
+        if peer_network is not None:
+            peers = peer_network.peers
+            for peer in peers:
+                msg_q.put_msg(new_block.to_dict(), peer)      
+        return home()
     else:
         return home()
 
