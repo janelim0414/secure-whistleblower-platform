@@ -57,3 +57,10 @@ class Block:
         self.curr_hash = temp_hash
         return self.curr_hash
             
+    def to_dict(self):
+        return {
+            'block_number': self.block_number,
+            'data': self.data,
+            'prev_hash': self.prev_hash,
+            'timestamp': self.timestamp
+        }

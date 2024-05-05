@@ -50,6 +50,8 @@ setInterval(fetchBlockchain, 1000);  // Update every 1000 milliseconds (1 second
 </html>
 """
 
+# peers = ['10.128.0.3', '10.128.0.4', '10.128.0.6']
+
 @app.route('/', methods=['GET'])
 def home():
     blockchain_data = blockchain.print_chain()
@@ -63,20 +65,20 @@ def submit():
     if message:
         last_block = blockchain.get_last_block()
         new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
-        new_block_hash = new_block.mine('0000')  # Assuming a difficulty level of '0000'
+        new_block_hash = new_block.mine('0000')
         blockchain.add_block(new_block, new_block_hash)
         # Broadcast the new block to peers
-        msg_q.put_msg((new_block.to_dict(), 'broadcast'))  # Assuming to_dict() method serializes the block
-        return home()
+        msg_q.put_msg((new_block.to_dict(), '10.128.0.4'))
+        msg_q.put_msg((new_block.to_dict(), '10.128.0.6'))
     else:
         return home()
 
 def run_p2p_network():
     try:
         global peer_network
-        is_tracker = False  # Adjust based on whether this node is the tracker
+        is_tracker = False  # True for tracker node
         tracker_addr = '10.128.0.5' 
-        tracker_port = 8000  # Example port
+        tracker_port = 8000 
         peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
         peer_network_thread = threading.Thread(target=peer_network.run)
         peer_network_thread.start()
