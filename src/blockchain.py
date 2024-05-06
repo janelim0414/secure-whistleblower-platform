@@ -27,7 +27,7 @@ class Blockchain:
         if most_recent_hash:
             self.most_recent_hash = most_recent_hash
         else:
-            self.most_recent_hash = '0'
+            self.most_recent_hash = self.get_last_block().curr_hash
 
     def create_genesis_block(self):
         """

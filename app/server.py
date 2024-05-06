@@ -65,10 +65,10 @@ def submit():
     message = request.form['message']
     if message:
         last_block = blockchain.get_last_block()
-        if last_block.block_number == 1:
-            new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
-        else:
-            new_block = Block(last_block.block_number + 1, message, last_block.curr_hash)
+        #if last_block.block_number == 1:
+        #    new_block = Block(last_block.block_number + 1, message, last_block.prev_hash)
+        #else:
+        new_block = Block(last_block.block_number + 1, message, last_block.curr_hash)
         new_block_hash = new_block.mine('0000')
         blockchain.add_block(new_block, new_block_hash)
         if peer_network is not None:
@@ -84,8 +84,8 @@ def run_p2p_network(is_tracker, tracker_addr):
         global peer_network
         tracker_port = 8000
         peer_network = PeerNetwork(is_tracker, tracker_addr, tracker_port, msg_q)
-        peer_network_thread = threading.Thread(target=peer_network.run)
-        peer_network_thread.start()
+        #peer_network_thread = threading.Thread(target=peer_network.run)
+        #peer_network_thread.start()
     except Exception as e:
         print(f"Error running P2P network: {e}")
 
