@@ -52,7 +52,6 @@ class PeerNetwork:
         self.peers = []
         self.peer_sockets = []
         self.recv_sockets = []
-        self.is_tracker = is_tracker
         self.tracker_addr = tracker_addr
         self.port = tracker_port
         self.hostname = gethostname()
@@ -63,12 +62,10 @@ class PeerNetwork:
         self.msg_q = msg_q
         self.blockchain = Blockchain()
         self.dict = {}  # maps ip to tracker socket connection
-
-    def run(self):
-        if self.is_tracker:
-            self._handleTracker()
+        if is_tracker:
+            threading.Thread(target=self._handleTracker, args=()).start()
         else:
-            self._handleNode()
+            threading.Thread(target=self._handleNode, args=()).start()
 
     def _handleNode(self):
         # add thread for validation of network
@@ -139,7 +136,7 @@ class PeerNetwork:
 
     def _nodeTrackerComm(self):
         """
-        communicate with traker to update list of peers across network
+        communicate with tracker to update list of peers across network
         handle newly joined peers by sending this node's blockchain
         """
         while True:
@@ -169,6 +166,10 @@ class PeerNetwork:
                         print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
                         print(f"dict data sent: {chain_copy.__dict__}")
                         s.sendall(header + chain_data.encode())
+                        
+                        #Testing - REMOVE THIS
+                        print("Peer sent!")
+
                         # start thread for sending blocks for this peer
                         threading.Thread(target=self._send, args=(s,)).start()
                 # update list of peers
@@ -181,14 +182,22 @@ class PeerNetwork:
         send to each peer/server connection
         """
         while True:
+            if self.msg_q.queue.qsize()!=0:
+                print("message updated! - qsize ",self.msg_q.queue.qsize())
             if not self.msg_q.queue_empty():
+                #Sending message!
+                print("Start sending...")
                 msg = self.msg_q.get_msg()  # retreive put request from queue
-                if msg[1] != self.ip:  # if the req is not for this node, skip and wait for more
+                if msg[1] == self.ip:  # if the req is not for this node, skip and wait for more
                     continue
                 # add block to this node's chain
                 last_block = self.blockchain.get_last_block()
                 last_block.print_block()
-                new_block = Block(last_block.block_number + 1, msg[0], last_block.prev_hash)  # create block from message
+                block_number = msg[0]['block_number']
+                message = msg[0]['data']
+                prev_hash = msg[0]['prev_hash']
+                #new_block = Block(last_block.block_number + 1, msg[0], last_block.curr_hash)  # create block from message
+                new_block = Block(block_number, message, prev_hash)
                 new_hash = new_block.mine('0000')  # get hash to verify block
                 try:
                     self.blockchain.add_block(new_block, new_hash)  # add to this node's chain as requested
@@ -281,6 +290,4 @@ if __name__ == "__main__":
     peer_network_thread = threading.Thread(target=run_p2p_net, args=(msg_q,))
     peer_network_thread.start()
 
-    # print("here")
-    # if not is_tracker:
-    #     msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
+

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # A new block can be added by to a Blockchain object
     # It's important to provide prev_hash to verify that this new block is valid
     # This is not a problem if a node adds a new block to its own local blockchain because they can simply get prev_hash from last_block
-    new_block = Block(last_block.block_number + 1, 'block 1 data', last_block.prev_hash)
+    new_block = Block(last_block.block_number + 1, 'block 1 data', last_block.curr_hash)
     # After a block is created, it needs to be mined to find the right nonce and curr_hash
     # mine() takes a difficulty level, which in this case is a string of 4 zeros. This is the condition for a valid hash.
     # mine() also returns the new hash of the block. This will be used to verifiy that a block is valid when adding it to a blockchain
