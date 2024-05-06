@@ -6,10 +6,10 @@ class Blockchain:
         initialize a blockchain
         
         parameters:
-        chain - list of Block types
-        block_number - int
-        most_recent_hash - str
-        hash_requirement - str
+        chain - 
+        block_number - 
+        most_recent_hash - 
+        hash_requirement - 
         """
         if hash_requirement:
             self.hash_requirement = hash_requirement
@@ -39,26 +39,11 @@ class Blockchain:
         return genesis_block
     
     def valid_proof(self, new_block, new_block_hash):
-        """
-        validate that the new block's prev_hash is valid
-        
-        arguments:
-        new_block - Block data to be added to chain (Block)
-        new_block_hash - Hash of the new block data (str)
-
-        returns: valid hash (bool)
-        """
         return new_block_hash.startswith(self.hash_requirement) and new_block_hash == new_block.get_hash(new_block.nonce)
     
     def add_block(self, new_block, new_block_hash):
         """
         validate that the new block's prev_hash is valid and if so, create a new Block object and add it to the chain
-        
-        arguments:
-        new_block: Block data to be added to chain (Block)
-        new_block_hash: Hash of the new block data (str)
-
-        returns: most recent hash (str)
         """
         if new_block.prev_hash == self.most_recent_hash and self.valid_proof(new_block, new_block_hash):
             self.block_number += 1

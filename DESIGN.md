@@ -55,3 +55,5 @@
 ## Demo Application - Secured Whistleblower Platform
 * A platform for verified users to anonymously reach out to appropriate authorities to act on their behalf against the misconduct of certain organizations or individuals
 * Only the parties of interest would be able to verify each other’s identities. This ensures both the privacy and validity of the information.
+
+

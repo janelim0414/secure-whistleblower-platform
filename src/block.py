@@ -8,12 +8,12 @@ class Block:
         initialize a block with relevant fields 
         
         parameters:
-        block_number - int
-        data - str
-        prev_hash - str
-        curr_hash - str
-        nonce - int
-        timestamp - datetime 
+        block_number - 
+        data - 
+        prev_hash - 
+        curr_hash - 
+        nonce - 
+        timestamp - 
         """
         self.block_number = block_number
         self.data = data
@@ -34,11 +34,6 @@ class Block:
     def get_hash(self, nonce):
         """
         compute and return a hash of current block given the data, prev_hash, and nonce value
-
-        arguments:
-        nonce - value representing nonce value (int)
-
-        returns: (str) hash of data, previous hash, and nonce 
         """
         sha = hashlib.sha256()
         sha.update(str(self.data).encode('utf-8') + str(self.prev_hash).encode('utf-8') + str(nonce).encode('utf-8')) 
@@ -48,10 +43,8 @@ class Block:
         """
         given all the information, find nonce that makes curr_hash valid based on the hash_difficulty provided
 
-        arguments:
-        hash_requirement - value representing hash difficulty (str)
-
-        returns: (str) current hash value after correct nonce and hash found
+        parameters:
+        hash_requirement
         """
         temp_nonce = 0
         temp_hash = self.get_hash(temp_nonce)

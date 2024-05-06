@@ -64,8 +64,10 @@ class PeerNetwork:
         self.dict = {}  # maps ip to tracker socket connection
         if is_tracker:
             threading.Thread(target=self._handleTracker, args=()).start()
+            #self._handleTracker()
         else:
             threading.Thread(target=self._handleNode, args=()).start()
+            #self._handleNode()
 
     def _handleNode(self):
         # add thread for validation of network
@@ -289,5 +291,9 @@ if __name__ == "__main__":
     msg_q = MsgQueue()
     peer_network_thread = threading.Thread(target=run_p2p_net, args=(msg_q,))
     peer_network_thread.start()
+
+    # print("here")
+    # if not is_tracker:
+    #     msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
 
 
