@@ -19,12 +19,22 @@ app = Flask(__name__)
 
 @app.route('/get_blockchain')
 def get_blockchain():
+    """
+    Flask Route for receiving and printing blockchain data
+
+    returns: str - representing blockchain data
+    """
     blockchain_data = peer_network.blockchain.print_chain()
     print(blockchain_data)
     return jsonify({'blockchain': blockchain_data or "No blocks in the blockchain."})
 
 @app.route('/', methods=['GET'])
 def home():
+    """
+    Flask Route for home page to display html template with blockchain data
+
+    returns: str - representing html template
+    """
     blockchain_data = peer_network.blockchain.print_chain()
     if not blockchain_data.strip():
         blockchain_data = "No blocks in the blockchain."
@@ -32,6 +42,14 @@ def home():
 
 @app.route('/submit', methods=['POST'])
 def submit():
+    """
+    Flask route for submitting/adding blocks to blockchain
+    using message from POST request
+
+    message - text from form field (str) 
+
+    return: str - representing the home page html with new blockchain data
+    """
     message = request.form['message']
     if message:
         last_block = peer_network.blockchain.get_last_block()
@@ -47,6 +65,13 @@ def submit():
         return home()
 
 def run_p2p_network(is_tracker, tracker_addr):
+    """
+    Initializes global variable peer_network using defined input parameters
+
+    arguments:
+    is_tracker - represents if current node is tracker (bool)
+    tracker_addr - represents the internal IP address of tracker node (str)
+    """
     try:
         global peer_network
         tracker_port = 8000
@@ -55,6 +80,11 @@ def run_p2p_network(is_tracker, tracker_addr):
         print(f"Error running P2P network: {e}")
 
 def find_available_port():
+    """
+    Helper function to find an available port to avoid socket errors
+
+    returns: (int) representing available port
+    """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(('localhost', 0))
     port = sock.getsockname()[1]
