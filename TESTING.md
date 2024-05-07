@@ -181,10 +181,10 @@ Block data = 'block 1 data from 10.128.0.7'
 Block added to = '10.128.0.7'
 
 Peer 1
+Expected behavior: send its chain to newly joined peers (first 10.128.0.7 then 10.128.0.8), receive new block from 10.128.0.7, add to its chain then send to 10.128.0.8
 
 ```
 Internal IP: 10.128.0.6
-Expected behavior: send its chain to newly joined peers (first 10.128.0.7 then 10.128.0.8), receive new block from 10.128.0.7, add to its chain then send to 10.128.0.8
 =====================================================================================================
 send channel connected from: 10.128.0.7
 dict data sent: {'chain': [{'block_number': 1, 'data': 'Genesis', 'prev_hash': '0', 'curr_hash': None, 'nonce': None, 'timestamp': datetime.datetime(2024, 5, 7, 15, 53, 43, 5664)}], 'block_number': 1, 'most_recent_hash': '0', 'hash_requirement': '0000'}
@@ -240,10 +240,10 @@ most recent hash: 0000f05398119156ee148923f7103c93a693005e9f08bb20e3bd9fd966f1b0
 ```
 
 Peer 2
+Expected behavior: send to/receive chain from 10.128.0.6, add new block to its chain, send block to 10.128.0.6 and send chain to 10.128.0.8 (new node)
 
 ```
 Internal IP: 10.128.0.7
-Expected behavior: send to/receive chain from 10.128.0.6, add new block to its chain, send block to 10.128.0.6 and send chain to 10.128.0.8 (new node)
 =====================================================================================================
 Client connected from: ('10.128.0.6', 46764)
 size of chain data to send: 252
@@ -299,10 +299,10 @@ most recent hash: 0000f05398119156ee148923f7103c93a693005e9f08bb20e3bd9fd966f1b0
 ```
 
 Peer 3
+Expected behavior: send/receive chain from peers 1 and 2
 
 ```
 Internal IP: 10.128.0.8
-Expected behavior: send/receive chain from peers 1 and 2
 =====================================================================================================
 send channel connected from: 10.128.0.6
 dict data sent: {'chain': [{'block_number': 1, 'data': 'Genesis', 'prev_hash': '0', 'curr_hash': None, 'nonce': None, 'timestamp': datetime.datetime(2024, 5, 7, 19, 35, 34, 80435)}], 'block_number': 1, 'most_recent_hash': '0', 'hash_requirement': '0000'}
