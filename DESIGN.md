@@ -41,15 +41,15 @@
 
 ## P2P Protocol
 ### Each node…
-* Locally store a blockchain
-* Get a list of all active nodes from tracker
-* Create a new block and sends it over the TCP to all other nodes
-* Verify incoming blocks before adding them to the local blockchain 
+* Locally stores a blockchain and receives longest blockchain upon joining
+* Periodically requests a list of all active nodes from tracker
+* Creates a new block and sends it over TCP to all other nodes
+* Receives a new block sent from the longest blockchain
 ### Tracker
-* Keep track of all active nodes (e.g., ports)
+* Keeps a list of addresses of all active nodes by periodically receiving/not receiving peers' addresses
 ### Special cases
 #### Ensuring that every node has the correct copy of their local blockchain:
-* Majority system - each node asks a copy of blockchain from all peers and choose the version supported by the majority 
+* Longest blockchain - only accept new block sent from the longest blockchain and newly joined peer is updated with the longest blockchain to avoid conflict
 * Timestamps - use timestamps to see which was created first
 
 ## Demo Application - Secured Whistleblower Platform
