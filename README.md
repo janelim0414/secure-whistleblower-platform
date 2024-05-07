@@ -19,7 +19,7 @@
 
 ## block.py:
 
-This file defines a Python class called Blockchain, which serves as a basic implementation of a block which is concatenated together in a blockchain data structure. The Block class encapsulates functionalities essential for managing a blockchain network, including block creation, validation, and mining. It also has a print_block function that can be used for debugging. 
+This file defines a Python class called Block, which serves as a basic implementation of a block which is concatenated together in a blockchain data structure. The Block class encapsulates functionalities essential for managing a blockchain network, including block creation, validation, and mining. It also has a print_block function that can be used for debugging. 
 
 ## blockchain.py:
 
@@ -34,6 +34,9 @@ Node 1: Initializes a Blockchain object and adds a new block ('block 1 data') to
 Node 2: Clones the blockchain from Node 1. Attempts to add invalid blocks to its local blockchain to illustrate error handling scenarios, such as providing an invalid previous hash or an invalid current hash.Receives a valid block from Node 1 and successfully adds it to its blockchain. 
 
 This script serves as a sandbox environment to illustrate the behavior of blockchain nodes, including block creation, validation, and addition to the blockchain. It helps understand how nodes interact and maintain consensus within a decentralized network.
+
+## test_blockchain.py:
+This is a testing script for all block and blockchain related functionalities. Please see more information in `TESTING.md`.
 
 ## p2p.py:
 
