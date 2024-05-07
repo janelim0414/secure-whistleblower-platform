@@ -3,7 +3,7 @@ import hashlib
 from pprint import pprint
 
 class Block:
-    def __init__(self, block_number, data, prev_hash):
+    def __init__(self, block_number, data, prev_hash, curr_hash=None, nonce=None, timestamp=None):
         """
         initialize a block with relevant fields 
         
@@ -18,9 +18,12 @@ class Block:
         self.block_number = block_number
         self.data = data
         self.prev_hash = prev_hash
-        self.curr_hash = None
-        self.nonce = None
+        self.curr_hash = curr_hash
+        self.nonce = nonce
         self.timestamp = datetime.datetime.now()
+    
+    def __str__(self):
+        return f"Block Number: {self.block_number}, Data: {self.data}, Hash: {self.curr_hash}, Prev Hash: {self.prev_hash}, Nonce: {self.nonce}, craeted at: {self.timestamp}"
     
     def print_block(self):
         """
@@ -54,3 +57,10 @@ class Block:
         self.curr_hash = temp_hash
         return self.curr_hash
             
+    def to_dict(self):
+        return {
+            'block_number': self.block_number,
+            'data': self.data,
+            'prev_hash': self.prev_hash,
+            'timestamp': self.timestamp
+        }
