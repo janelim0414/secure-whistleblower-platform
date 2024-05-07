@@ -42,12 +42,12 @@ This is a testing script for all block and blockchain related functionalities. P
 
 This Python file implements a simplified peer-to-peer (P2P) blockchain network using TCP sockets for communication. The nodes in the network carry out the following functionality: 
 
-new node:
-- new node signals tracker by sending its ip address
-- new node creates TCP connections with node information received from tracker node
-- new node receives longest chain from peers upon joining
+New node:
+- signals tracker by sending its ip address
+- creates TCP connections with node information received from tracker node
+- receives longest chain from peers upon joining
 
-peer nodes:
+Peer nodes:
 - each peer node periodically notifies tracker of its membership
 - maintains blockchain and send/receive blocks over TCP
 - two threads for receive() and send() -- is both a server and a client
@@ -55,6 +55,6 @@ peer nodes:
 - send new block to all peers
 
 tracker node:
-- default behavior: keeps a timer for each peer node
+- default behavior: continuously requests and receives ip addresses of joined nodes
 - when new node joins: records ip addresses of new nodes and sends ip addresses of registered nodes
 - when a node leaves: no response from peer and knows the node exited -- remove address from the list
