@@ -16,6 +16,11 @@
 * Initialize a block given data and block_number
 ##### mine(hash_difficulty)
 * Given all the information, find nonce that makes curr_hash valid based on the hash_difficulty provided
+##### get_hash(nonce)
+* Compute and return a hash of current block given the data, prev_hash, and nonce value
+##### print_block()
+* A debugging function that print the whole block
+
 
 ### Blockchain class
 #### Overview:
@@ -29,12 +34,17 @@
 ##### init() - initizes the chain
 ##### create_genesis_block()
 * Create a dummy head for the block chain
-##### create_block(prev_hash, data)
-* Validate that prev_hash is valid and if so, create a new Block object and add it to the chain
+##### add_block(new_block, new_block_hash)
+* Add a new block to the chain if it is valid (hash values match and valid proof is obtained)
+##### valid_proof(new_block, new_block_hash)
+* Check the validity of the block and is used when a new block is being added to the chain
 ##### get_chain()
 * Return the whole chain
 ##### get_last_block()
 * Return the last block in the chain
+##### print_chain()
+* A debugging function that print the whole chain
+
 
 ### Note
 * In this architecture, P2P has to handle all broadcasting of blockchain data, including packaging block data into appropriate packet in bytes
