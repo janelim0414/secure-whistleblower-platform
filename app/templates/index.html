@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whistleblower App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <style>
+        body { padding-top: 20px; }
+        .container { max-width: 800px; }
+        .block-display { margin-top: 20px; }
+        .block-detail { padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">Whistleblower Blockchain Application</h1>
+        <div class="card">
+            <div class="card-body">
+                <form action="/submit" method="post">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message:</label>
+                        <textarea id="message" name="message" rows="4" class="form-control"></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <h2 class="mt-5">Blockchain:</h2>
+        <div id="blockchainDisplay" class="block-display"></div>
+    </div>
+
+    <script>
+        function fetchBlockchain() {
+            fetch('/get_blockchain')
+                .then(response => response.json())
+                .then(data => {
+                    const blocks = data.blockchain.split(';').map(block => block.trim());
+                    const formattedBlocks = blocks.map(block => {
+                        const details = block.split(',').map(detail => `<div class="col-md-6 block-detail">${detail.trim()}</div>`);
+                        return `<div class="row">${details.join('')}</div>`;
+                    });
+                    document.getElementById('blockchainDisplay').innerHTML = formattedBlocks.join('<hr>');
+                })
+                .catch(error => console.error('Error fetching blockchain:', error));
+        }
+
+        // Poll for new blockchain data every 5 seconds
+        setInterval(fetchBlockchain, 5000);
+        // Fetch immediately on page load
+        fetchBlockchain();
+    </script>
+</body>
+</html>
