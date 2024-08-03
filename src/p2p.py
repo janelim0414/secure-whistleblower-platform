@@ -56,7 +56,6 @@ class PeerNetwork:
         self.port = tracker_port
         self.hostname = gethostname()
         self.ip = gethostbyname(self.hostname)
-        print("Internal IP:", self.ip)
         self.socket = None
         self.servSock = None
         self.msg_q = msg_q
@@ -77,7 +76,7 @@ class PeerNetwork:
         self.servSock = socket(AF_INET, SOCK_STREAM)
         self.servSock.bind((self.ip, self.port))  
         self.servSock.listen()    
-
+        # Start a thread to initiate communication on the node side
         threading.Thread(target=self._nodeTrackerComm, args=()).start()
 
         while True:
@@ -85,9 +84,8 @@ class PeerNetwork:
             client_socket, client_address = self.servSock.accept()
             self.recv_sockets.append(client_socket)
             print(f"Client connected from: {client_address}")
-
-            threading.Thread(target=self._receive, args=(client_socket,)).start()  # create a thread for each peer connection (recv channel)
-              # create a thread for each peer connection (recv channel)
+            # Create a thread for each peer connection (recv channel)
+            threading.Thread(target=self._receive, args=(client_socket,)).start()  
 
     def _receive(self, client_socket):
         """
@@ -103,38 +101,26 @@ class PeerNetwork:
             elif header == "c":  # chain received from peers
                 chain_data = client_socket.recv(1024).decode() 
                 chain_data = json.loads(chain_data)
-                print(f"chain received: {chain_data}")
                 chain = Blockchain(**chain_data)
                 blocks = []
                 for block_data in chain_data["chain"]:
                     block = Block(**block_data)
                     blocks.append(block)
                 chain.chain = blocks
-                print(f"received blockchain: {chain.print_chain()}")
+                print(f"Chain received: {chain.print_chain()}")
                 if len(chain.chain) > len(self.blockchain.chain):
-                    print("updated this chain")
                     self.blockchain = chain  # update chain with longest 
-                    self.blockchain.print_chain()
+                    print(f"Chain updated: {self.blockchain.print_chain()}")
             elif header == "b":  # new block added by other peer
                 new_block = client_socket.recv(1024).decode() 
                 new_block = json.loads(new_block)
                 new_block = Block(**new_block)
-                print(f"new block's nonce: {new_block.nonce}, type {type(new_block.nonce)}")
-                print(f"new block's hash: {new_block.curr_hash}")
-                print(f"new block's hash computed again: {new_block.get_hash(new_block.nonce)}")
-                print(f"this blockchain's hash requirement: {self.blockchain.hash_requirement}")
-                print(f"new block's current hash: {new_block.curr_hash}")
-                print(f"new block's prev hash: {new_block.prev_hash}")
-                print(f"this blockchain's most recent hash: {self.blockchain.most_recent_hash}")
                 try:
                     # add incoming block to this blockchain
                     self.blockchain.add_block(new_block, new_block.curr_hash)
+                    print(f"Block added: {self.blockchain.print_chain()}")
                 except Exception as e:
                     print(e)
-            print("current chain:")
-            print(self.blockchain.chain)
-            self.blockchain.print_chain()
-            print(f"most recent hash: {self.blockchain.most_recent_hash}")
 
     def _nodeTrackerComm(self):
         """
@@ -149,14 +135,11 @@ class PeerNetwork:
             # save updated list of peers from tracker
             else:  
                 new_peers = decoded_data.split(",")
-                print(f"list of peers: {self.peers}")
-                print(f"received from tracker: {new_peers}")
                 for peer in new_peers:
                     if (not peer in self.peers) and (peer != self.ip):
                         # create send channel from this node to newly joined node
                         s = socket(AF_INET, SOCK_STREAM)
                         s.connect((peer, self.port)) 
-                        print(f"send channel connected from: {peer}")
                         self.peer_sockets.append(s)
                         # send chain of this node to newly joined node
                         chain_copy = copy.deepcopy(self.blockchain)
@@ -165,30 +148,21 @@ class PeerNetwork:
                             chain_copy.chain[i] = block.__dict__
                         chain_data = json.dumps(chain_copy.__dict__, default=datetime_serializer)
                         header = "c".encode()  # "c" for chain
-                        print(f"size of chain data to send: {sys.getsizeof(header + chain_data.encode())}")
-                        print(f"dict data sent: {chain_copy.__dict__}")
                         s.sendall(header + chain_data.encode())
-                        
-                        #Testing - REMOVE THIS
-                        print("Peer sent!")
-
                         # start thread for sending blocks for this peer
                         threading.Thread(target=self._send, args=(s,)).start()
                 # update list of peers
                 new_peers.remove(self.ip)
                 self.peers = new_peers
-                print(f"updated list of peers: {self.peers}\n")
+                print(f"Updated peers: {self.peers}\n")
     
     def _send(self, send_sock):
         """
         send to each peer/server connection
         """
         while True:
-            if self.msg_q.queue.qsize()!=0:
-                print("message updated! - qsize ",self.msg_q.queue.qsize())
             if not self.msg_q.queue_empty():
-                #Sending message!
-                print("Start sending...")
+                #Sending message
                 msg = self.msg_q.get_msg()  # retreive put request from queue
                 if msg[1] == self.ip:  # if the req is not for this node, skip and wait for more
                     continue
@@ -205,13 +179,11 @@ class PeerNetwork:
                     self.blockchain.add_block(new_block, new_hash)  # add to this node's chain as requested
                 except Exception as e:
                     print(e)
-                print(f"block added to {self.ip} per request:")
-                self.blockchain.print_chain()
+                print(f"Block added to {self.ip}")
                 # send block to peers
                 block_to_send = json.dumps(new_block.__dict__, default=datetime_serializer)
                 header = "b".encode()  # "b" for block
-                # TODO check if send needs to be kept in one thread 
-                print(f"sending new block from {self.ip} to {send_sock}")
+                print(f"Sending new block from {self.ip} to {send_sock}")
                 send_sock.sendall(header + block_to_send.encode())  # send block to peers  
 
     def _handleTracker(self):
@@ -220,9 +192,8 @@ class PeerNetwork:
         self.socket = socket(AF_INET, SOCK_STREAM)
         self.socket.bind((self.tracker_addr, self.port))
         self.socket.listen()
-
         print(f"Server listening on port: {self.port}\n")
-
+        # Start a thread to initiate communication on the tracker side
         threading.Thread(target=self._trackerNodeComm, args=()).start()
 
         while True:
@@ -249,8 +220,6 @@ class PeerNetwork:
                         self._handleNewPeer(socket, decoded_data)
                 except ConnectionResetError:
                     # Handle the case where the peer disconnects abruptly
-                    print(self.peer_sockets)
-                    print(self.peers)
                     self._handlePeerLeave(socket)
 
     def _handlePeerLeave(self, socket):
@@ -265,7 +234,6 @@ class PeerNetwork:
             self.peers.remove(peer_ip)
             for s in self.peer_sockets:
                 s.sendall(",".join(self.peers).encode())  # Send updated list of peers
-                print(f"Updated list of peers sent to {s}: {self.peers}")
 
     def _handleNewPeer(self, socket, peer_ip):
         """
@@ -276,7 +244,6 @@ class PeerNetwork:
         print(f"New peer joined: {peer_ip}\n")
         for s in self.peer_sockets:
             s.sendall(",".join(self.peers).encode())  # Send updated list of peers
-            print(f"Updated list of peers sent to {s}: {self.peers}")
         
 
 if __name__ == "__main__":
@@ -291,9 +258,5 @@ if __name__ == "__main__":
     msg_q = MsgQueue()
     peer_network_thread = threading.Thread(target=run_p2p_net, args=(msg_q,))
     peer_network_thread.start()
-
-    # print("here")
-    # if not is_tracker:
-    #     msg_q.put_msg('block 1 data from 10.128.0.7', '10.128.0.7')
 
 
